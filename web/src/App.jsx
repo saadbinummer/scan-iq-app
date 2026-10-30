@@ -19,9 +19,9 @@ import { fetchProductByBarcode } from "./services/openFoodFacts";
 import { AlertCircle, Sparkles } from "lucide-react";
 
 export default function App() {
-  // 1. Language state (defaults to Malayalam per request, or saved user choice)
+  // 1. Language state (defaults to English as primary language)
   const [currentLang, setCurrentLang] = useState(() => {
-    return localStorage.getItem("scaniq_lang") || localStorage.getItem("ca_lang") || "ml";
+    return localStorage.getItem("scaniq_lang_v2") || "en";
   });
 
   const t = translations[currentLang] || translations.en;
@@ -35,7 +35,7 @@ export default function App() {
 
   // Update HTML document direction and lang
   useEffect(() => {
-    localStorage.setItem("scaniq_lang", currentLang);
+    localStorage.setItem("scaniq_lang_v2", currentLang);
     const activeLangConfig = languages.find((l) => l.code === currentLang);
     document.documentElement.dir = activeLangConfig?.dir || "ltr";
     document.documentElement.lang = currentLang;
