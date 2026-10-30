@@ -1,0 +1,9 @@
+{
+  "appId": "com.scaniq.app",
+  "appName": "ScanIQ",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

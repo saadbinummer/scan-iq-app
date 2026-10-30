@@ -1,0 +1,13 @@
+{
+  "name": "scaniq-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ScanIQ Monorepo Workspace (Android, iOS, Backend, Web)",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "server": "npm --prefix backend run start",
+    "dev:backend": "npm --prefix backend run dev",
+    "lint": "npm --prefix web run lint"
+  }
+}

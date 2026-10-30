@@ -1,0 +1,17 @@
+{
+  "short_name": "ScanIQ",
+  "name": "ScanIQ — Universal Product Intelligence",
+  "description": "Instant Barcode Scanner, Nuanced Food Health Inspector, and Universal Price Comparison",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "display": "standalone",
+  "orientation": "portrait"
+}

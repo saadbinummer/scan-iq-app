@@ -1,0 +1,7 @@
+platform :ios, '14.0'
+use_frameworks!
+
+# ScanIQ iOS Podfile
+target 'App' do
+  # Pods for ScanIQ iOS
+end
