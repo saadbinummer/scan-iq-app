@@ -11,7 +11,9 @@ import {
   ScanLine,
   ArrowRight,
   ShieldCheck,
-  Zap
+  Zap,
+  Mic,
+  MicOff
 } from "lucide-react";
 
 export default function BarcodeScannerModal({ isOpen, onClose, onScanSuccess, t }) {
@@ -21,8 +23,39 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScanSuccess, t 
   const [currentCameraIndex, setCurrentCameraIndex] = useState(0);
   const [manualCode, setManualCode] = useState("");
   const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [isVoiceListening, setIsVoiceListening] = useState(false);
   const scannerRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  const startVoiceInput = () => {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert("Voice search not supported on this browser.");
+      return;
+    }
+    try {
+      const rec = new SpeechRec();
+      rec.lang = "en-IN";
+      rec.continuous = false;
+      rec.onstart = () => setIsVoiceListening(true);
+      rec.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        if (text) {
+          const numbersOnly = text.replace(/\D/g, "");
+          if (numbersOnly.length >= 8) {
+            handleBarcodeFound(numbersOnly);
+          } else {
+            setManualCode(text);
+          }
+        }
+      };
+      rec.onerror = () => setIsVoiceListening(false);
+      rec.onend = () => setIsVoiceListening(false);
+      rec.start();
+    } catch {
+      setIsVoiceListening(false);
+    }
+  };
 
   // Synthesized scan beep feedback
   const playScanBeep = useCallback(() => {
@@ -301,16 +334,29 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScanSuccess, t 
             />
           </div>
 
-          {/* Manual Barcode Search Form */}
+          {/* Manual Barcode & Voice Search Form */}
           <form onSubmit={handleManualSubmit} className="mt-4 w-full">
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={manualCode}
-                onChange={(e) => setManualCode(e.target.value)}
-                placeholder="Enter barcode numbers (e.g. 8901058852448)..."
-                className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 font-mono transition-colors"
-              />
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={manualCode}
+                  onChange={(e) => setManualCode(e.target.value)}
+                  placeholder="Enter barcode or speak (e.g. 8901058852448)..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 font-mono transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={startVoiceInput}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all cursor-pointer ${
+                    isVoiceListening ? "bg-rose-500 text-white animate-pulse" : "text-slate-400 hover:text-emerald-400"
+                  }`}
+                  title="Speak Barcode or Product Name"
+                >
+                  {isVoiceListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
               <button
                 type="submit"
                 disabled={!manualCode.trim()}

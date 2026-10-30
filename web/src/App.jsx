@@ -9,6 +9,8 @@ import DealsHubScreen from "./components/screens/DealsHubScreen";
 import StoreVsOnlineScreen from "./components/screens/StoreVsOnlineScreen";
 import ComparisonScreen from "./components/screens/ComparisonScreen";
 import CustomerSupportScreen from "./components/screens/CustomerSupportScreen";
+import HistoryFavoritesScreen from "./components/screens/HistoryFavoritesScreen";
+import GoogleLoginModal from "./components/auth/GoogleLoginModal";
 import BarcodeScannerModal from "./components/BarcodeScannerModal";
 import OcrVerificationModal from "./components/OcrVerificationModal";
 import DisclaimerBanner from "./components/DisclaimerBanner";
@@ -16,6 +18,7 @@ import { translations } from "./i18n/translations";
 import { languages } from "./components/Navbar";
 import { sampleProducts } from "./data/sampleProducts";
 import { fetchProductByBarcode } from "./services/openFoodFacts";
+import { getCurrentUser, addToScanHistory } from "./services/authService";
 import { AlertCircle, Sparkles } from "lucide-react";
 
 export default function App() {
@@ -27,11 +30,15 @@ export default function App() {
   const t = translations[currentLang] || translations.en;
   const isMalayalam = currentLang === "ml";
 
-  // Active Tab: "scan" | "health" | "compare" | "deals" | "storeVsOnline" | "support"
+  // Active Tab: "scan" | "health" | "calorie" | "compare" | "history" | "deals" | "storeVsOnline" | "support"
   const [currentTab, setCurrentTab] = useState("scan");
 
   // Selected product for full intelligence card view (when on scan tab)
   const [selectedProductForDetail, setSelectedProductForDetail] = useState(null);
+
+  // User auth state
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Update HTML document direction and lang
   useEffect(() => {
@@ -40,6 +47,14 @@ export default function App() {
     document.documentElement.dir = activeLangConfig?.dir || "ltr";
     document.documentElement.lang = currentLang;
   }, [currentLang]);
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setCurrentUser(getCurrentUser());
+    };
+    window.addEventListener("scaniq_auth_change", handleAuthChange);
+    return () => window.removeEventListener("scaniq_auth_change", handleAuthChange);
+  }, []);
 
   // 2. Products state
   const [productsList, setProductsList] = useState(sampleProducts);
@@ -77,6 +92,8 @@ export default function App() {
       setActiveProduct(foundProduct);
       setSelectedProductForDetail(foundProduct);
       setCurrentTab("scan");
+      addToScanHistory(foundProduct);
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       // If user was comparing, slot it in
       if (currentTab === "compare") {
@@ -96,24 +113,25 @@ export default function App() {
     setActiveProduct(newProduct);
     setSelectedProductForDetail(newProduct);
     setCurrentTab("scan");
+    addToScanHistory(newProduct);
     showNotification(`Verified and saved: ${newProduct.name}`, "success");
   };
 
   const handleTabChange = (tabId) => {
     setCurrentTab(tabId);
-    if (tabId !== "scan") {
-      // Keep selected product intact, but if user explicitly changes tab, switch view
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans transition-colors selection:bg-emerald-500 selection:text-white">
-      {/* 1. Top Luxury Header with Logo & Tabs */}
+      {/* 1. Top Luxury Header with Logo, Tabs & Google Profile */}
       <LuxuryHeader
         currentTab={currentTab}
         onTabChange={handleTabChange}
         currentLang={currentLang}
         onLanguageChange={setCurrentLang}
+        currentUser={currentUser}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
         t={t}
       />
 
@@ -163,13 +181,24 @@ export default function App() {
                 setActiveProduct(p);
                 setCurrentTab("calorie");
               }}
+              onSelectAlternative={(altProduct) => {
+                setSelectedProductForDetail(altProduct);
+                setActiveProduct(altProduct);
+                addToScanHistory(altProduct);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               isMalayalam={isMalayalam}
               t={t}
             />
           ) : (
             <ScanScreen
               productsList={productsList}
-              onSelectProduct={(p) => setSelectedProductForDetail(p)}
+              onSelectProduct={(p) => {
+                setSelectedProductForDetail(p);
+                setActiveProduct(p);
+                addToScanHistory(p);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               onOpenScanner={() => setIsScannerOpen(true)}
               onOpenOcr={() => setIsOcrOpen(true)}
               onQuickScanBarcode={handleScanSuccess}
@@ -212,7 +241,7 @@ export default function App() {
           />
         )}
 
-        {/* Tab 3: Head-to-Head & True Value Comparison */}
+        {/* Tab 4: Head-to-Head & True Value Comparison */}
         {currentTab === "compare" && (
           <ComparisonScreen
             slot1={slot1}
@@ -232,7 +261,23 @@ export default function App() {
           />
         )}
 
-        {/* Tab 4: Live Deals Hub */}
+        {/* Tab 5: Personal Scan History & Saved Favorites */}
+        {currentTab === "history" && (
+          <HistoryFavoritesScreen
+            onSelectProduct={(p) => {
+              setSelectedProductForDetail(p);
+              setActiveProduct(p);
+              setCurrentTab("scan");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            onOpenScanner={() => setIsScannerOpen(true)}
+            onOpenLogin={() => setIsLoginModalOpen(true)}
+            isMalayalam={isMalayalam}
+            t={t}
+          />
+        )}
+
+        {/* Tab 6: Live Deals Hub */}
         {currentTab === "deals" && (
           <DealsHubScreen
             activeProduct={activeProduct}
@@ -243,7 +288,7 @@ export default function App() {
           />
         )}
 
-        {/* Tab 5: Physical In-Store vs Online Price Checker */}
+        {/* Tab 7: Physical In-Store vs Online Price Checker */}
         {currentTab === "storeVsOnline" && (
           <StoreVsOnlineScreen
             activeProduct={activeProduct}
@@ -255,7 +300,7 @@ export default function App() {
           />
         )}
 
-        {/* Tab 6: Customer Support & Guarded AI Assistant */}
+        {/* Tab 8: Customer Support & Guarded AI Assistant */}
         {currentTab === "support" && (
           <CustomerSupportScreen
             activeProduct={activeProduct}
@@ -267,7 +312,7 @@ export default function App() {
         )}
       </main>
 
-      {/* 3. Barcode Scanner Modal */}
+      {/* 3. Barcode Scanner Modal with Live Camera & Voice Input */}
       <BarcodeScannerModal
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
@@ -283,14 +328,21 @@ export default function App() {
         t={t}
       />
 
-      {/* 5. Mobile Floating Bottom Navigation */}
+      {/* 5. Google Login & Dietary Shield Modal */}
+      <GoogleLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        t={t}
+      />
+
+      {/* 6. Mobile Floating Bottom Navigation */}
       <LuxuryBottomNav
         currentTab={currentTab}
         onTabChange={handleTabChange}
         t={t}
       />
 
-      {/* 6. Medical & Transparency Disclaimer Footer */}
+      {/* 7. Medical & Transparency Disclaimer Footer */}
       <DisclaimerBanner t={t} />
     </div>
   );

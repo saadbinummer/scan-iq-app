@@ -1,5 +1,14 @@
 import React from "react";
-import { ScanLine, Activity, Flame, ShoppingBag, Store, ArrowLeftRight, HelpCircle } from "lucide-react";
+import {
+  ScanLine,
+  Activity,
+  Flame,
+  ShoppingBag,
+  Store,
+  ArrowLeftRight,
+  HelpCircle,
+  History
+} from "lucide-react";
 
 export default function LuxuryBottomNav({ currentTab, onTabChange, t }) {
   const tabs = [
@@ -7,9 +16,9 @@ export default function LuxuryBottomNav({ currentTab, onTabChange, t }) {
     { id: "health", label: t.tabs.health, icon: Activity },
     { id: "calorie", label: t.tabs.calorie || "Calorie", icon: Flame },
     { id: "compare", label: t.tabs.compare, icon: ArrowLeftRight },
+    { id: "history", label: "History", icon: History },
     { id: "deals", label: t.tabs.deals, icon: ShoppingBag },
     { id: "storeVsOnline", label: t.tabs.storeVsOnline, icon: Store },
-    { id: "support", label: t.tabs.support, icon: HelpCircle },
   ];
 
   return (

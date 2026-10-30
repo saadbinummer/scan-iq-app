@@ -1,5 +1,5 @@
-import React from "react";
-import { Search, Camera, FileUp, Sparkles, Filter } from "lucide-react";
+import React, { useState } from "react";
+import { Search, Camera, FileUp, Sparkles, Filter, Mic, MicOff } from "lucide-react";
 
 export default function SearchBar({
   searchQuery,
@@ -12,19 +12,63 @@ export default function SearchBar({
   onQuickSelect,
   t
 }) {
+  const [isListening, setIsListening] = useState(false);
+
+  const startVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice search is not supported in this browser. Please use Chrome, Edge, or Safari.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-IN"; // English/Indian context
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (transcript) {
+          onSearchChange(transcript);
+          if (onSearchSubmit) onSearchSubmit(transcript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.warn("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.warn("Speech recognition start failed:", err);
+      setIsListening(false);
+    }
+  };
+
   const quickItems = [
-    { label: "Quaker Oats (1kg)", query: "Quaker" },
-    { label: "Kellogg's Chocos", query: "Kellogg" },
-    { label: "Britannia NutriChoice", query: "NutriChoice" },
-    { label: "Good Day Cookies", query: "Good Day" },
-    { label: "Valencia Orange Juice", query: "Orange" },
+    { label: "Maggi Noodles", query: "Maggi" },
+    { label: "Amul Butter", query: "Amul" },
+    { label: "Quaker Oats", query: "Quaker" },
+    { label: "NutriChoice", query: "NutriChoice" },
+    { label: "Dairy Milk", query: "Cadbury" },
+    { label: "Lay's Chips", query: "Lay's" },
   ];
 
   const categories = [
-    { id: "all", label: t.filters.all },
-    { id: "snacks", label: t.filters.snacks },
-    { id: "cereals", label: t.filters.cereals },
-    { id: "beverages", label: t.filters.beverages },
+    { id: "all", label: t?.filters?.all || "All" },
+    { id: "snacks", label: t?.filters?.snacks || "Snacks" },
+    { id: "cereals", label: t?.filters?.cereals || "Cereals & Grains" },
+    { id: "beverages", label: t?.filters?.beverages || "Beverages" },
   ];
 
   return (
@@ -43,75 +87,61 @@ export default function SearchBar({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={t.searchPlaceholder}
-            className="w-full pl-11 rtl:pl-4 rtl:pr-11 pr-4 py-3 bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-900 text-sm sm:text-base rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+            placeholder={t?.searchPlaceholder || "Search any product, brand, or barcode..."}
+            className="w-full pl-11 rtl:pl-4 rtl:pr-11 pr-12 py-3 bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-900 text-sm sm:text-base rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
           />
+
+          {/* Voice Search Mic Button */}
+          <button
+            type="button"
+            onClick={startVoiceSearch}
+            className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all cursor-pointer ${
+              isListening
+                ? "bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30 ring-2 ring-rose-300"
+                : "text-slate-400 hover:text-emerald-600 hover:bg-slate-200/60"
+            }`}
+            title="Search by Voice (Click and speak)"
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </button>
         </div>
 
-        <div className="flex flex-wrap sm:flex-nowrap gap-2 items-center">
-          <button
-            type="submit"
-            className="flex-1 sm:flex-none px-5 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-sm rounded-xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1.5"
-          >
-            <Search className="w-4 h-4" />
-            <span>{t.searchBtn}</span>
-          </button>
-
+        <div className="flex gap-2">
+          {/* Barcode Camera Button */}
           <button
             type="button"
             onClick={onOpenScanner}
-            className="flex-1 sm:flex-none px-4 py-3 bg-teal-50 hover:bg-teal-100 active:scale-95 text-teal-800 border border-teal-200 font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
+            className="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-slate-950 text-sm font-bold rounded-xl transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
           >
-            <Camera className="w-4 h-4 text-teal-600" />
-            <span className="whitespace-nowrap">{t.scanBtn}</span>
+            <Camera className="w-4 h-4" />
+            <span>{t?.scanBtn || "Scan"}</span>
           </button>
 
+          {/* Search Action */}
           <button
-            type="button"
-            onClick={onOpenOcr}
-            className="flex-1 sm:flex-none px-4 py-3 bg-indigo-50 hover:bg-indigo-100 active:scale-95 text-indigo-800 border border-indigo-200 font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-1.5"
+            type="submit"
+            className="px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
           >
-            <FileUp className="w-4 h-4 text-indigo-600" />
-            <span className="whitespace-nowrap">{t.uploadOcrBtn}</span>
+            {t?.common?.search || "Search"}
           </button>
         </div>
       </form>
 
-      {/* Category Filter Pills & Quick Try Suggestions */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <Filter className="w-3.5 h-3.5 text-slate-400 mr-1" />
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => onCategoryChange(cat.id)}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                selectedCategory === cat.id
-                  ? "bg-slate-900 text-white shadow-2xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Quick Try shortcuts */}
-        <div className="flex items-center gap-1.5 flex-wrap text-slate-500">
-          <span className="font-semibold text-slate-700 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-amber-500" /> {t.quickTry}
-          </span>
-          {quickItems.map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => onQuickSelect(item.query)}
-              className="text-emerald-700 hover:text-emerald-900 underline underline-offset-2 hover:bg-emerald-50 px-1 py-0.5 rounded transition-colors"
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+      {/* Quick Keywords Chips */}
+      <div className="mt-3.5 flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100">
+        <span className="text-xs font-semibold text-slate-400 mr-1 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-amber-500" /> Popular:
+        </span>
+        {quickItems.map((item) => (
+          <button
+            key={item.label}
+            type="button"
+            onClick={() => onQuickSelect(item.query)}
+            className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border border-slate-200/60 text-slate-600 font-medium transition-colors cursor-pointer"
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
     </div>
   );

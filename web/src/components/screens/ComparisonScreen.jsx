@@ -238,49 +238,139 @@ export default function ComparisonScreen({
           {/* CONDITIONAL SPECIFICATIONS / NUTRITION COMPARISON */}
           {bothFood ? (
             /* Food Nutrition Side-by-Side */
-            <div className="p-6 sm:p-8">
-              <h3 className="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
-                <Info className="w-4 h-4 text-emerald-600" /> Side-by-Side Nutrition Profile (per 100g)
-              </h3>
+            <div className="p-6 sm:p-8 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+                    <Info className="w-5 h-5 text-emerald-600" />
+                    <span>{isMalayalam ? "പോക്ഷകമൂല്യവും ആരോഗ്യവും നേർക്കുനേർ താരതമ്യം" : "Comprehensive Nutrition & Health Matrix"}</span>
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {isMalayalam
+                      ? "പ്രൈസ് മാത്രമല്ല, കലോറി, പഞ്ചസാര, പ്രോട്ടീൻ, ഉപ്പ്, പാം-ഓയിൽ എന്നിവയുടെ സമഗ്ര താരതമ്യം."
+                      : "Head-to-head evaluation of calories, sugars, proteins, sodium, and ingredients per 100g."}
+                  </p>
+                </div>
 
-              <div className="overflow-x-auto">
+                {/* Clear Health Winner Badge */}
+                {eval1 && eval2 && !eval1.isDataIncomplete && !eval2.isDataIncomplete && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-500">Healthier Choice:</span>
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-black text-xs flex items-center gap-1 shadow-2xs">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      {eval1.score >= eval2.score ? name1 : name2}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* 1-Sentence Health Verdict & Grade Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Product 1 Verdict */}
+                <div className={`p-4 rounded-2xl border ${
+                  eval1?.status === "HEALTHY" ? "bg-emerald-50/70 border-emerald-200" : eval1?.status === "CAUTION" ? "bg-rose-50/70 border-rose-200" : "bg-amber-50/70 border-amber-200"
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-extrabold text-slate-900 text-sm truncate">{name1}</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-white shadow-2xs">
+                      Nutri-Grade: <strong>{eval1?.grade || "N/A"}</strong>
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-snug">
+                    {eval1?.singleSentenceVerdict?.fullText || "Nutritional evaluation active."}
+                  </p>
+                </div>
+
+                {/* Product 2 Verdict */}
+                <div className={`p-4 rounded-2xl border ${
+                  eval2?.status === "HEALTHY" ? "bg-emerald-50/70 border-emerald-200" : eval2?.status === "CAUTION" ? "bg-rose-50/70 border-rose-200" : "bg-amber-50/70 border-amber-200"
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-extrabold text-slate-900 text-sm truncate">{name2}</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-white shadow-2xs">
+                      Nutri-Grade: <strong>{eval2?.grade || "N/A"}</strong>
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-snug">
+                    {eval2?.singleSentenceVerdict?.fullText || "Nutritional evaluation active."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Detailed Matrix Table */}
+              <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full text-xs sm:text-sm border-collapse text-left">
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 text-slate-700">
-                      <th className="py-3 px-4 font-semibold w-1/3">Nutrient</th>
+                      <th className="py-3 px-4 font-semibold w-1/3">Nutrient / Metric (per 100g)</th>
                       <th className="py-3 px-4 font-bold text-emerald-950 bg-emerald-50/50">{name1}</th>
                       <th className="py-3 px-4 font-bold text-teal-950 bg-teal-50/50">{name2}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     <tr>
-                      <td className="py-2.5 px-4 font-medium text-slate-600">Serving Size</td>
-                      <td className="py-2.5 px-4 text-slate-800">{slot1.nutritionalInfo?.servingSize || "100g"}</td>
-                      <td className="py-2.5 px-4 text-slate-800">{slot2.nutritionalInfo?.servingSize || "100g"}</td>
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Package Size</td>
+                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot1.packageSize?.value}{slot1.packageSize?.unit}</td>
+                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot2.packageSize?.value}{slot2.packageSize?.unit}</td>
                     </tr>
                     <tr className="bg-slate-50/40">
-                      <td className="py-2.5 px-4 font-medium text-slate-600">Calories (kcal)</td>
-                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot1.nutritionalInfo?.calories ?? "-"}</td>
-                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot2.nutritionalInfo?.calories ?? "-"}</td>
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Unit Price (₹/100g)</td>
+                      <td className={`py-2.5 px-4 font-black ${comparison.betterValue === "A" ? "text-emerald-600" : "text-slate-800"}`}>
+                        ₹{comparison.unitA} {comparison.betterValue === "A" && "✓ Cheaper"}
+                      </td>
+                      <td className={`py-2.5 px-4 font-black ${comparison.betterValue === "B" ? "text-emerald-600" : "text-slate-800"}`}>
+                        ₹{comparison.unitB} {comparison.betterValue === "B" && "✓ Cheaper"}
+                      </td>
                     </tr>
                     <tr>
-                      <td className="py-2.5 px-4 font-medium text-slate-600">Sugar (g)</td>
-                      <td className={`py-2.5 px-4 font-bold ${Number(slot1.nutritionalInfo?.sugar) > 10 ? "text-amber-600" : "text-emerald-700"}`}>
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Calories (Energy)</td>
+                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot1.nutritionalInfo?.calories ?? "-"} kcal</td>
+                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot2.nutritionalInfo?.calories ?? "-"} kcal</td>
+                    </tr>
+                    <tr className="bg-slate-50/40">
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Refined Sugar</td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot1.nutritionalInfo?.sugar || 0) < Number(slot2.nutritionalInfo?.sugar || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-amber-700"}`}>
                         {slot1.nutritionalInfo?.sugar !== null && slot1.nutritionalInfo?.sugar !== undefined ? `${slot1.nutritionalInfo.sugar}g` : "-"}
                       </td>
-                      <td className={`py-2.5 px-4 font-bold ${Number(slot2.nutritionalInfo?.sugar) > 10 ? "text-amber-600" : "text-emerald-700"}`}>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot2.nutritionalInfo?.sugar || 0) < Number(slot1.nutritionalInfo?.sugar || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-amber-700"}`}>
                         {slot2.nutritionalInfo?.sugar !== null && slot2.nutritionalInfo?.sugar !== undefined ? `${slot2.nutritionalInfo.sugar}g` : "-"}
                       </td>
                     </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Protein (Muscle Building)</td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot1.nutritionalInfo?.protein || 0) > Number(slot2.nutritionalInfo?.protein || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-slate-800"}`}>
+                        {slot1.nutritionalInfo?.protein !== null && slot1.nutritionalInfo?.protein !== undefined ? `${slot1.nutritionalInfo.protein}g` : "-"}
+                      </td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot2.nutritionalInfo?.protein || 0) > Number(slot1.nutritionalInfo?.protein || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-slate-800"}`}>
+                        {slot2.nutritionalInfo?.protein !== null && slot2.nutritionalInfo?.protein !== undefined ? `${slot2.nutritionalInfo.protein}g` : "-"}
+                      </td>
+                    </tr>
                     <tr className="bg-slate-50/40">
-                      <td className="py-2.5 px-4 font-medium text-slate-600">Saturated Fat (g)</td>
-                      <td className="py-2.5 px-4 text-slate-800">{slot1.nutritionalInfo?.saturatedFat !== null && slot1.nutritionalInfo?.saturatedFat !== undefined ? `${slot1.nutritionalInfo.saturatedFat}g` : "-"}</td>
-                      <td className="py-2.5 px-4 text-slate-800">{slot2.nutritionalInfo?.saturatedFat !== null && slot2.nutritionalInfo?.saturatedFat !== undefined ? `${slot2.nutritionalInfo.saturatedFat}g` : "-"}</td>
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Dietary Fiber (Gut Health)</td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot1.nutritionalInfo?.fiber || 0) > Number(slot2.nutritionalInfo?.fiber || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-slate-800"}`}>
+                        {slot1.nutritionalInfo?.fiber !== null && slot1.nutritionalInfo?.fiber !== undefined ? `${slot1.nutritionalInfo.fiber}g` : "-"}
+                      </td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot2.nutritionalInfo?.fiber || 0) > Number(slot1.nutritionalInfo?.fiber || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-slate-800"}`}>
+                        {slot2.nutritionalInfo?.fiber !== null && slot2.nutritionalInfo?.fiber !== undefined ? `${slot2.nutritionalInfo.fiber}g` : "-"}
+                      </td>
                     </tr>
                     <tr>
-                      <td className="py-2.5 px-4 font-medium text-slate-600">Protein (g)</td>
-                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot1.nutritionalInfo?.protein !== null && slot1.nutritionalInfo?.protein !== undefined ? `${slot1.nutritionalInfo.protein}g` : "-"}</td>
-                      <td className="py-2.5 px-4 text-slate-800 font-bold">{slot2.nutritionalInfo?.protein !== null && slot2.nutritionalInfo?.protein !== undefined ? `${slot2.nutritionalInfo.protein}g` : "-"}</td>
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Sodium (Salt)</td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot1.nutritionalInfo?.sodium || 0) < Number(slot2.nutritionalInfo?.sodium || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-slate-800"}`}>
+                        {slot1.nutritionalInfo?.sodium !== null && slot1.nutritionalInfo?.sodium !== undefined ? `${slot1.nutritionalInfo.sodium}mg` : "-"}
+                      </td>
+                      <td className={`py-2.5 px-4 font-bold ${Number(slot2.nutritionalInfo?.sodium || 0) < Number(slot1.nutritionalInfo?.sodium || 0) ? "text-emerald-700 bg-emerald-50/40" : "text-slate-800"}`}>
+                        {slot2.nutritionalInfo?.sodium !== null && slot2.nutritionalInfo?.sodium !== undefined ? `${slot2.nutritionalInfo.sodium}mg` : "-"}
+                      </td>
+                    </tr>
+                    <tr className="bg-slate-50/40">
+                      <td className="py-2.5 px-4 font-medium text-slate-600">Palm Oil / Palmolein</td>
+                      <td className="py-2.5 px-4 font-bold">
+                        {eval1?.hasPalmOil ? <span className="text-rose-600">⚠️ Yes</span> : <span className="text-emerald-600">✓ No</span>}
+                      </td>
+                      <td className="py-2.5 px-4 font-bold">
+                        {eval2?.hasPalmOil ? <span className="text-rose-600">⚠️ Yes</span> : <span className="text-emerald-600">✓ No</span>}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
