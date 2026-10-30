@@ -73,7 +73,7 @@ export default function ScanScreen({
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-3">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>ScanIQ Intelligence Engine</span>
+            <span>NutriVerse Intelligence Engine</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight mb-2">

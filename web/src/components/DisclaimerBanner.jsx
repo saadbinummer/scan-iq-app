@@ -40,7 +40,7 @@ export default function DisclaimerBanner({ t }) {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2 text-xs">
-            <span className="font-semibold text-slate-400">ScanIQ &copy; 2026</span>
+            <span className="font-semibold text-slate-400">NutriVerse &copy; 2026</span>
             <span className="hidden sm:inline text-slate-700">•</span>
             <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
               Powered by vornixverse

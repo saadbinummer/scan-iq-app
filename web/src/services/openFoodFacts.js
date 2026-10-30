@@ -22,7 +22,7 @@ export async function fetchProductByBarcode(barcode) {
     const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${cleanBarcode}.json`, {
       signal: controller.signal,
       headers: {
-        "User-Agent": "ScanIQ - Web App - Version 1.0 (saad@vornixverse.com)"
+        "User-Agent": "NutriVerse - Web App - Version 1.0 (saad@vornixverse.com)"
       }
     });
     clearTimeout(timeoutId);
@@ -135,11 +135,11 @@ export async function fetchProductByBarcode(barcode) {
       { store: "Amazon Fresh", platform: "Amazon", price: 44, delivery: 0, discount: 5, coupon: "FRESH5", finalPayable: 39, dataType: "LIVE_API_FEED", url: "https://amazon.in" },
       { store: "Zepto", platform: "Zepto", price: 43, delivery: 15, discount: 0, finalPayable: 58, dataType: "LIVE_API_FEED", url: "https://zepto.com" }
     ],
-    dataSource: "ScanIQ Universal Food Engine (Live Scanned)",
+    dataSource: "NutriVerse Universal Food Engine (Live Scanned)",
     isDataIncomplete: false
   };
 
-  return { success: true, product: fallbackProduct, source: "ScanIQ Universal Engine" };
+  return { success: true, product: fallbackProduct, source: "NutriVerse Universal Engine" };
 }
 
 export async function searchProducts(query) {

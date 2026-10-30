@@ -1,6 +1,6 @@
 export const translations = {
   en: {
-    appName: "ScanIQ",
+    appName: "NutriVerse",
     tagline: "Universal Product Scanner & Food Health Intelligence",
     credits: "Powered by vornixverse, Created by Saad",
     tabs: {
@@ -176,8 +176,8 @@ export const translations = {
   },
 
   ml: {
-    appName: "ScanIQ (സ്കാൻ ഐക്യു)",
-    tagline: "യൂണിവേഴ്സൽ ബാർകോഡ് സ്കാനർ & ഫുഡ് ഹെൽത്ത് ഇന്റലിജൻസ്",
+    appName: "NutriVerse (ന്യൂട്രിവേഴ്സ്)",
+    tagline: "യൂണിവേഴ്സൽ ഫുഡ് ഇന്റലിജൻസ് & പ്രൈസ് കോമ്പസ്",
     credits: "Powered by vornixverse • Created by Saad (സാദ് നിർമ്മിച്ചത്)",
     tabs: {
       scan: "സ്കാൻ & വിവരങ്ങൾ",
@@ -316,7 +316,7 @@ export const translations = {
     support: {
       title: "കസ്റ്റമർ സപ്പോർട്ടും AI അസിസ്റ്റന്റും",
       subtitle: "ഉൽപ്പന്ന സംശയങ്ങൾക്ക് കൃത്യമായ മറുപടിയും സഹായവും",
-      aiChatTitle: "ScanIQ AI അസിസ്റ്റന്റ്",
+      aiChatTitle: "NutriVerse AI അസിസ്റ്റന്റ്",
       aiDisclaimer: "ഉൽപ്പന്ന വിവരങ്ങൾക്കും ചേരുവകൾക്കും മാത്രമുള്ളതാണ് AI. ഇതൊരു മെഡിക്കൽ നിർദ്ദേശമല്ല.",
       aiPlaceholder: "ചേരുവകളെക്കുറിച്ചോ ഫോൺ സ്പെസിഫിക്കേഷനുകളെക്കുറിച്ചോ ചോദിക്കൂ...",
       send: "ചോദിക്കുക",
@@ -344,7 +344,7 @@ export const translations = {
   },
 
   hi: {
-    appName: "ScanIQ (स्कैन आईक्यू)",
+    appName: "NutriVerse (न्यूट्रीवर्स)",
     tagline: "सार्वभौमिक उत्पाद स्कैनर व खाद्य स्वास्थ्य इंटेलिजेंस",
     credits: "Powered by vornixverse • Created by Saad (साद द्वारा निर्मित)",
     tabs: {
@@ -484,7 +484,7 @@ export const translations = {
     support: {
       title: "सहायता और AI सहायक",
       subtitle: "सामग्री और उत्पाद सहायता",
-      aiChatTitle: "ScanIQ AI सहायक",
+      aiChatTitle: "NutriVerse AI सहायक",
       aiDisclaimer: "केवल सूचनात्मक मार्गदर्शन के लिए। कोई चिकित्सीय सलाह नहीं।",
       aiPlaceholder: "सामग्री या गैजेट विशेषताओं के बारे में पूछें...",
       send: "पूछें",
@@ -512,7 +512,7 @@ export const translations = {
   },
 
   es: {
-    appName: "ScanIQ",
+    appName: "NutriVerse",
     tagline: "Escáner Universal e Inteligencia Nutricional",
     credits: "Powered by vornixverse, Creado por Saad",
     tabs: {
@@ -652,7 +652,7 @@ export const translations = {
     support: {
       title: "Soporte al Cliente e IA Asistente",
       subtitle: "Consultas de ingredientes y soporte técnico",
-      aiChatTitle: "IA de Productos ScanIQ",
+      aiChatTitle: "IA de Productos NutriVerse",
       aiDisclaimer: "Solo para fines informativos. No es asesoramiento médico.",
       aiPlaceholder: "Pregunte sobre ingredientes o especificaciones...",
       send: "Preguntar",
@@ -680,7 +680,7 @@ export const translations = {
   },
 
   ar: {
-    appName: "ScanIQ (سكان آي كيو)",
+    appName: "NutriVerse (نيوتري فيرس)",
     tagline: "الماسح الشامل للمنتجات وذكاء صحة الغذاء",
     credits: "Powered by vornixverse • تم الإنشاء بواسطة سعد (Saad)",
     tabs: {
@@ -820,7 +820,7 @@ export const translations = {
     support: {
       title: "خدمة العملاء والذكاء الاصطناعي",
       subtitle: "أسئلة حول المكونات ودعم البيانات",
-      aiChatTitle: "مساعد ScanIQ الذكي",
+      aiChatTitle: "مساعد NutriVerse الذكي",
       aiDisclaimer: "للإرشاد والمعلومات العامة فقط. ليس بديلاً عن الاستشارة الطبية.",
       aiPlaceholder: "اسأل عن المكونات أو مواصفات الأجهزة...",
       send: "إرسال",
@@ -848,7 +848,7 @@ export const translations = {
   },
 
   fr: {
-    appName: "ScanIQ",
+    appName: "NutriVerse",
     tagline: "Scanner Universel & Intelligence Nutritionnelle",
     credits: "Powered by vornixverse, Créé par Saad",
     tabs: {
@@ -988,7 +988,7 @@ export const translations = {
     support: {
       title: "Service Client & Assistant IA",
       subtitle: "Questions sur les ingrédients et support technique",
-      aiChatTitle: "Assistant IA ScanIQ",
+      aiChatTitle: "Assistant IA NutriVerse",
       aiDisclaimer: "À titre informatif uniquement. Pas d'avis médical.",
       aiPlaceholder: "Posez une question sur les ingrédients ou la tech...",
       send: "Envoyer",
@@ -1016,7 +1016,7 @@ export const translations = {
   },
 
   de: {
-    appName: "ScanIQ",
+    appName: "NutriVerse",
     tagline: "Universeller Scanner & Lebensmittel-Intelligenz",
     credits: "Powered by vornixverse, Erstellt von Saad",
     tabs: {
@@ -1156,7 +1156,7 @@ export const translations = {
     support: {
       title: "Kundenservice & KI-Assistent",
       subtitle: "Fragen zu Lebensmitteln und Datenhilfe",
-      aiChatTitle: "ScanIQ KI-Assistent",
+      aiChatTitle: "NutriVerse KI-Assistent",
       aiDisclaimer: "Nur zur Information. Keine medizinische Beratung.",
       aiPlaceholder: "Fragen Sie zu Zutaten oder Technik-Details...",
       send: "Fragen",

@@ -267,7 +267,7 @@ export default function CustomerSupportScreen({
               <span>Platform Origins & Creator</span>
             </div>
             <h4 className="text-base font-black text-white">
-              ScanIQ Ecosystem
+              NutriVerse Ecosystem
             </h4>
             <p className="text-xs text-slate-400 leading-relaxed">
               Designed and engineered by <strong className="text-amber-300 font-bold">Saad</strong> as part of the <strong className="text-emerald-400 font-bold">vornixverse</strong> digital universe.

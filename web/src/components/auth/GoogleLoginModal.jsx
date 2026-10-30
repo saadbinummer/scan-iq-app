@@ -99,7 +99,7 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
             </div>
             <div>
               <h3 className="font-extrabold text-white text-base">
-                {currentUser ? "ScanIQ Member Profile" : "Google Sign-In"}
+                {currentUser ? "NutriVerse Member Profile" : "Google Sign-In"}
               </h3>
               <p className="text-xs text-slate-400">
                 {currentUser ? "Personalized Health & Dietary Filter" : "Unlock Scan History & Custom Allergy Filters"}
@@ -214,7 +214,7 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
                   )}
                 </div>
                 <p className="text-[11px] text-slate-400">
-                  Select your dietary restrictions. ScanIQ will immediately warn you whenever a scanned food item conflicts with your profile.
+                  Select your dietary restrictions. NutriVerse will immediately warn you whenever a scanned food item conflicts with your profile.
                 </p>
 
                 <div className="space-y-2 pt-1 max-h-56 overflow-y-auto custom-scrollbar pr-1">

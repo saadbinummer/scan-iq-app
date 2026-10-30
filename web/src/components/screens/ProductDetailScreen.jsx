@@ -310,7 +310,7 @@ export default function ProductDetailScreen({
             </div>
 
             <p className="text-[11px] text-slate-400 pt-1">
-              {t.productDetail.dataSource}: <span className="text-slate-300 font-semibold">{product.dataSource || "ScanIQ Verified Hub"}</span>
+              {t.productDetail.dataSource}: <span className="text-slate-300 font-semibold">{product.dataSource || "NutriVerse Verified Hub"}</span>
             </p>
           </div>
 

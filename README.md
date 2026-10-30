@@ -1,7 +1,7 @@
-# 🌟 ScanIQ — Universal Product Intelligence & Health Platform
+# 🌿 NutriVerse — Universal Food Intelligence & Health Platform
 > **Powered by vornixverse • Created by Saad**
 
-ScanIQ is an intelligent product scanner, nuanced food health inspector, calorie calculator, and universal multi-store price comparison platform. Part of the **vornixverse** ecosystem, created by **Saad**.
+NutriVerse is an intelligent product scanner, nuanced food health inspector, calorie calculator, and universal multi-store price comparison platform. Part of the **vornixverse** ecosystem, created by **Saad**.
 
 ---
 

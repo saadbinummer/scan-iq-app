@@ -51,8 +51,8 @@ export default function LuxuryHeader({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-300 bg-clip-text text-transparent">
-                  ScanIQ
+                <span className="font-black text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
+                  NutriVerse
                 </span>
                 <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   <Sparkles className="w-3 h-3 mr-1 text-amber-400" /> PRO

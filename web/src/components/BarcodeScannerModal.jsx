@@ -241,7 +241,7 @@ export default function BarcodeScannerModal({ isOpen, onClose, onScanSuccess, t 
             </div>
             <div>
               <h3 className="font-extrabold text-white text-base sm:text-lg flex items-center gap-1.5">
-                <span>ScanIQ Barcode Intelligence</span>
+                <span>NutriVerse Barcode & Nutrition Engine</span>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-semibold">
                   LIVE
                 </span>
