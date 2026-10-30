@@ -33,11 +33,14 @@ export default function ScanScreen({
 
   // Quick Demo Barcode triggers for instant testing without camera
   const quickDemoBarcodes = [
+    { name: "Maggi Masala Noodles", code: "8901058852448", type: "food", icon: "🍜" },
+    { name: "Amul Butter 100g", code: "8901262010054", type: "food", icon: "🧈" },
+    { name: "Britannia NutriChoice", code: "8901030382345", type: "food", icon: "🍪" },
+    { name: "Lay's Magic Masala", code: "8901491101837", type: "food", icon: "🥔" },
+    { name: "Cadbury Dairy Milk", code: "8901233024844", type: "food", icon: "🍫" },
+    { name: "Quaker Rolled Oats", code: "8901499008544", type: "food", icon: "🥣" },
     { name: "iPhone 15 (128GB)", code: "195949012345", type: "tech", icon: "📱" },
     { name: "Galaxy S24 5G", code: "8806091876543", type: "tech", icon: "🤖" },
-    { name: "Quaker Rolled Oats", code: "8901499008544", type: "food", icon: "🥣" },
-    { name: "Britannia NutriChoice", code: "8901030382345", type: "food", icon: "🍪" },
-    { name: "MacBook Air M2", code: "194253789012", type: "tech", icon: "💻" },
     { name: "Slice Mango Drink", code: "8901725181155", type: "food", icon: "🥭" }
   ];
 
