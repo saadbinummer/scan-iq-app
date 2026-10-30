@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   X,
   Shield,
@@ -9,12 +9,17 @@ import {
   LogOut,
   Sparkles,
   Heart,
-  Sliders
+  Sliders,
+  Camera,
+  Upload,
+  Edit2,
+  Check
 } from "lucide-react";
 import {
   getCurrentUser,
   loginWithGoogle,
   logout,
+  updateUserProfile,
   getDietaryPreferences,
   saveDietaryPreferences
 } from "../../services/authService";
@@ -23,17 +28,51 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
   const [currentUser, setCurrentUser] = useState(getCurrentUser());
   const [dietaryPrefs, setDietaryPrefs] = useState(getDietaryPreferences());
   const [isSavedToast, setIsSavedToast] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-    setCurrentUser(getCurrentUser());
+    const user = getCurrentUser();
+    setCurrentUser(user);
+    if (user) setCustomName(user.name);
     setDietaryPrefs(getDietaryPreferences());
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const presetAvatars = [
+    {
+      id: "founder",
+      name: "Founder",
+      url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "tech_pro",
+      name: "Tech Pro",
+      url: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "creative",
+      name: "Creative",
+      url: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=200&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "executive",
+      name: "Executive",
+      url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&auto=format&fit=crop&q=80"
+    },
+    {
+      id: "monogram",
+      name: "Golden S",
+      url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80"
+    }
+  ];
+
   const handleGoogleLogin = () => {
     const user = loginWithGoogle();
     setCurrentUser(user);
+    setCustomName(user.name);
   };
 
   const handleLogout = () => {
@@ -41,12 +80,47 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
     setCurrentUser(null);
   };
 
+  const handleSelectAvatar = (url) => {
+    const updated = updateUserProfile({ avatar: url });
+    setCurrentUser(updated);
+    showToast();
+  };
+
+  const handleCustomPhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result;
+      if (dataUrl) {
+        const updated = updateUserProfile({ avatar: dataUrl });
+        setCurrentUser(updated);
+        showToast();
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveName = () => {
+    if (customName.trim()) {
+      const updated = updateUserProfile({ name: customName.trim() });
+      setCurrentUser(updated);
+      setIsEditingName(false);
+      showToast();
+    }
+  };
+
+  const showToast = () => {
+    setIsSavedToast(true);
+    setTimeout(() => setIsSavedToast(false), 2500);
+  };
+
   const handleTogglePref = (key) => {
     const updated = { ...dietaryPrefs, [key]: !dietaryPrefs[key] };
     setDietaryPrefs(updated);
     saveDietaryPreferences(updated);
-    setIsSavedToast(true);
-    setTimeout(() => setIsSavedToast(false), 2500);
+    showToast();
   };
 
   const filterOptions = [
@@ -88,8 +162,8 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col text-slate-100 my-auto">
         
         {/* Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-800 flex items-center justify-between">
@@ -102,7 +176,7 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
                 {currentUser ? "NutriVerse Member Profile" : "Google Sign-In"}
               </h3>
               <p className="text-xs text-slate-400">
-                {currentUser ? "Personalized Health & Dietary Filter" : "Unlock Scan History & Custom Allergy Filters"}
+                {currentUser ? "Profile Photo, Identity & Allergy Shield" : "Unlock Scan History & Custom Allergy Filters"}
               </p>
             </div>
           </div>
@@ -173,31 +247,112 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
               </button>
             </div>
           ) : (
-            /* Logged In View: Profile + Allergy / Sensitivity Toggles */
+            /* Logged In View: Profile Customizer + Allergy / Sensitivity Toggles */
             <div className="space-y-4">
-              {/* User Identity Card */}
-              <div className="p-3.5 bg-slate-800/80 rounded-2xl border border-slate-700/80 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={currentUser.avatar}
-                    alt={currentUser.name}
-                    className="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-400"
-                  />
-                  <div>
-                    <h4 className="text-sm font-extrabold text-white flex items-center gap-1.5">
-                      <span>{currentUser.name}</span>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    </h4>
-                    <p className="text-[11px] text-slate-400 font-mono">{currentUser.email}</p>
+              
+              {/* User Identity Card with Photo Edit */}
+              <div className="p-4 bg-slate-800/90 rounded-2xl border border-slate-700/80 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="relative group">
+                      <img
+                        src={currentUser.avatar}
+                        alt={currentUser.name}
+                        className="w-13 h-13 rounded-2xl object-cover ring-2 ring-emerald-400 shadow-md"
+                      />
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute -bottom-1 -right-1 p-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-lg shadow-sm transition-transform cursor-pointer"
+                        title="Upload Photo"
+                      >
+                        <Camera className="w-3 h-3 stroke-[2.5]" />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      {isEditingName ? (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <input
+                            type="text"
+                            value={customName}
+                            onChange={(e) => setCustomName(e.target.value)}
+                            className="bg-slate-950 text-white text-xs font-bold px-2 py-1 rounded-lg border border-emerald-500 focus:outline-hidden w-32"
+                            placeholder="Your Name"
+                          />
+                          <button
+                            onClick={handleSaveName}
+                            className="p-1 bg-emerald-500 text-slate-950 rounded-lg text-xs"
+                          >
+                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-sm font-extrabold text-white truncate">{currentUser.name}</h4>
+                          <button
+                            onClick={() => setIsEditingName(true)}
+                            className="text-slate-400 hover:text-white p-0.5"
+                            title="Edit Name"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        </div>
+                      )}
+                      <p className="text-[11px] text-slate-400 font-mono">{currentUser.email}</p>
+                      <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-md mt-1 inline-block">
+                        vornixverse Founder Account
+                      </span>
+                    </div>
                   </div>
+
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer text-xs font-semibold flex items-center gap-1"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer text-xs font-semibold flex items-center gap-1"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
+
+                {/* Avatar Gallery Selector & Upload Photo Button */}
+                <div className="pt-2 border-t border-slate-700/70">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold text-slate-300">Choose Profile Picture / Avatar:</span>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-[11px] font-bold text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Upload className="w-3 h-3" />
+                      <span>Upload Photo</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                    {presetAvatars.map((av) => (
+                      <button
+                        key={av.id}
+                        onClick={() => handleSelectAvatar(av.url)}
+                        className={`w-9 h-9 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                          currentUser.avatar === av.url
+                            ? "border-emerald-400 ring-2 ring-emerald-400/40 scale-105"
+                            : "border-slate-700 hover:border-slate-500 opacity-70 hover:opacity-100"
+                        }`}
+                        title={av.name}
+                      >
+                        <img src={av.url} alt={av.name} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCustomPhotoUpload}
+                    className="hidden"
+                  />
+                </div>
               </div>
 
               {/* Personalized Allergy Filter Section */}
@@ -217,7 +372,7 @@ export default function GoogleLoginModal({ isOpen, onClose, t }) {
                   Select your dietary restrictions. NutriVerse will immediately warn you whenever a scanned food item conflicts with your profile.
                 </p>
 
-                <div className="space-y-2 pt-1 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                <div className="space-y-2 pt-1 max-h-52 overflow-y-auto custom-scrollbar pr-1">
                   {filterOptions.map((opt) => {
                     const isChecked = !!dietaryPrefs[opt.key];
                     return (

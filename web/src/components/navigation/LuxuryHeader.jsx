@@ -15,6 +15,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { languages } from "../Navbar";
+import NutriVerseLogo from "../common/NutriVerseLogo";
 
 export default function LuxuryHeader({
   currentTab,
@@ -46,9 +47,7 @@ export default function LuxuryHeader({
             className="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer group"
             onClick={() => onTabChange("scan")}
           >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-amber-400 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-400/40 group-hover:scale-105 transition-transform">
-              <Scan className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" />
-            </div>
+            <NutriVerseLogo className="w-10 h-10 sm:w-11 sm:h-11" />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">

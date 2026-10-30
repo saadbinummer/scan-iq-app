@@ -24,16 +24,25 @@ export function getCurrentUser() {
 
 export function loginWithGoogle(customUser = null) {
   const user = customUser || {
-    id: "g_user_10928374",
-    name: "Saad (vornixverse)",
+    id: "g_user_saad_vornix",
+    name: "Saad",
+    title: "Founder, vornixverse",
     email: "saad@vornixverse.com",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    authProvider: "Google",
+    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80",
+    authProvider: "Google Verified",
     joinedDate: new Date().toLocaleDateString()
   };
   localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
   window.dispatchEvent(new Event("scaniq_auth_change"));
   return user;
+}
+
+export function updateUserProfile(updatedFields) {
+  const current = getCurrentUser() || loginWithGoogle();
+  const updated = { ...current, ...updatedFields };
+  localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new Event("scaniq_auth_change"));
+  return updated;
 }
 
 export function logout() {
