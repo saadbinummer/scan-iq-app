@@ -90,8 +90,22 @@ export default function LuxuryHeader({
           </nav>
 
           {/* Actions: Google User & Language Switcher */}
-          <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
+          <div className="flex items-center space-x-2 rtl:space-x-reverse">
             
+            {/* Mobile AI Support Quick Button */}
+            <button
+              onClick={() => onTabChange("support")}
+              className={`lg:hidden px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                currentTab === "support"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 shadow-md shadow-emerald-500/30"
+                  : "bg-slate-800 hover:bg-slate-700 border-emerald-500/40 text-emerald-300 shadow-xs"
+              }`}
+              title="NutriVerse Support & AI Assistant"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              <span className="text-[11px] font-black">AI Support</span>
+            </button>
+
             {/* Google User Profile Button */}
             <button
               onClick={onOpenLogin}

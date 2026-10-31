@@ -19,7 +19,7 @@ import { languages } from "./components/Navbar";
 import { sampleProducts } from "./data/sampleProducts";
 import { fetchProductByBarcode } from "./services/openFoodFacts";
 import { getCurrentUser, addToScanHistory } from "./services/authService";
-import { AlertCircle, Sparkles } from "lucide-react";
+import { AlertCircle, Sparkles, Bot } from "lucide-react";
 
 export default function App() {
   // 1. Language state (defaults to English as primary language)
@@ -332,8 +332,27 @@ export default function App() {
       <GoogleLoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={(user) => {
+          showNotification(`✓ Welcome, ${user.name}! Google profile & allergy shield activated.`, "success");
+        }}
+        onLogoutSuccess={() => {
+          showNotification("Signed out of Google account", "info");
+        }}
         t={t}
       />
+
+      {/* Floating AI Assistant Action Button for Mobile Screens */}
+      {currentTab !== "support" && (
+        <button
+          onClick={() => handleTabChange("support")}
+          className="lg:hidden fixed bottom-18 right-3.5 z-40 flex items-center gap-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-2.5 rounded-full shadow-2xl shadow-emerald-600/50 border border-emerald-300/30 active:scale-95 transition-all group cursor-pointer"
+          aria-label="Open NutriVerse AI Assistant"
+        >
+          <div className="w-2 h-2 rounded-full bg-emerald-300 animate-ping" />
+          <Bot className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform" />
+          <span className="text-xs font-black tracking-wide">Ask AI</span>
+        </button>
+      )}
 
       {/* 6. Mobile Floating Bottom Navigation */}
       <LuxuryBottomNav
