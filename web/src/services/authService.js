@@ -24,12 +24,12 @@ export function getCurrentUser() {
 
 export function loginWithGoogle(customUser = null) {
   const user = customUser || {
-    id: "g_user_saad_vornix",
-    name: "Saad",
-    title: "Founder, vornixverse",
-    email: "saad@vornixverse.com",
+    id: `g_user_${Date.now()}`,
+    name: "Google User",
+    title: "Google Verified Member",
+    email: "user@gmail.com",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80",
-    authProvider: "Google Verified",
+    authProvider: "Google Account",
     joinedDate: new Date().toLocaleDateString()
   };
   localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));

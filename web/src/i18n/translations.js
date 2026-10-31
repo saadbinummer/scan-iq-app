@@ -10,7 +10,7 @@ export const translations = {
       compare: "True Value & Compare",
       deals: "Live Deals Hub",
       storeVsOnline: "In-Store vs Online",
-      support: "Support & AI"
+      support: "Support and AI"
     },
     quickTry: "Quick Try:",
     searchPlaceholder: "Search any food or electronic item (e.g. iPhone, Oats, Galaxy S24, Biscuits)...",
@@ -186,7 +186,7 @@ export const translations = {
       compare: "താരതമ്യം & ട്രൂ വാല്യൂ",
       deals: "ഡീൽ ഫൈൻഡർ",
       storeVsOnline: "കട vs ഓൺലൈൻ",
-      support: "സഹായം & AI"
+      support: "Support and AI"
     },
     quickTry: "വേഗത്തിൽ പരീക്ഷിക്കാൻ:",
     searchPlaceholder: "ഏതെങ്കിലും ഫുഡ് അല്ലെങ്കിൽ ഇലക്ട്രോണിക്സ് തിരയുക (ഉദാ: ഐഫോൺ, ഓട്സ്, സാംസങ്, ബിസ്ക്കറ്റ്)...",

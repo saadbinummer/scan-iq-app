@@ -23,7 +23,7 @@ export default function LuxuryBottomNav({ currentTab, onTabChange, t }) {
     { id: "history", label: isMl ? "ഹിസ്റ്ററി" : "History", icon: History },
     { id: "deals", label: isMl ? "ഡീൽ" : "Deals", icon: ShoppingBag },
     { id: "storeVsOnline", label: isMl ? "കടകൾ" : "Stores", icon: Store },
-    { id: "support", label: isMl ? "AI സപ്പോർട്ട്" : "AI Support", icon: Bot, isAi: true },
+    { id: "support", label: isMl ? "സപ്പോർട്ട് & AI" : "Support and AI", icon: HelpCircle, isAi: true },
   ];
 
   return (

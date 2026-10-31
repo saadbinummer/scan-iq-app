@@ -16,7 +16,10 @@ import {
   Check,
   ArrowRight,
   UserPlus,
-  Loader2
+  Loader2,
+  Mail,
+  Lock,
+  LogIn
 } from "lucide-react";
 import {
   getCurrentUser,
@@ -39,11 +42,22 @@ export default function GoogleLoginModal({
   const [isSavedToast, setIsSavedToast] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [customName, setCustomName] = useState("");
+  
+  // Login tabs: "google" | "form"
+  const [loginMode, setLoginMode] = useState("google");
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectingStatus, setConnectingStatus] = useState("");
-  const [showCustomForm, setShowCustomForm] = useState(false);
-  const [customInputName, setCustomInputName] = useState("");
-  const [customInputEmail, setCustomInputEmail] = useState("");
+
+  // Quick Google input
+  const [quickGoogleEmail, setQuickGoogleEmail] = useState("");
+
+  // Fill in the blanks form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    rememberMe: true
+  });
 
   const fileInputRef = useRef(null);
 
@@ -53,40 +67,42 @@ export default function GoogleLoginModal({
     if (user) setCustomName(user.name);
     setDietaryPrefs(getDietaryPreferences());
     setIsConnecting(false);
-    setShowCustomForm(false);
+    setLoginMode("google");
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const presetAvatars = [
     {
-      id: "founder",
-      name: "Founder",
+      id: "pro_blue",
+      name: "Blue Icon",
       url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80"
     },
     {
       id: "tech_pro",
-      name: "Tech Pro",
+      name: "Green Icon",
       url: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200&auto=format&fit=crop&q=80"
     },
     {
       id: "creative",
-      name: "Creative",
+      name: "Purple Icon",
       url: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=200&auto=format&fit=crop&q=80"
     },
     {
       id: "executive",
-      name: "Executive",
+      name: "Teal Icon",
       url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&auto=format&fit=crop&q=80"
     },
     {
-      id: "monogram",
-      name: "Golden S",
+      id: "gold",
+      name: "Amber Icon",
       url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80"
     }
   ];
 
-  const handleInstantGoogleLogin = (accountType = "saad") => {
+  // 1. Google 1-Click / Device Google Account Login
+  const handleGoogleOneClick = (e) => {
+    if (e) e.preventDefault();
     setIsConnecting(true);
     setConnectingStatus("Connecting to Google Accounts...");
 
@@ -95,30 +111,26 @@ export default function GoogleLoginModal({
     }, 350);
 
     setTimeout(() => {
-      let userObj;
-      if (accountType === "saad") {
-        userObj = {
-          id: "g_user_saad_vornix",
-          name: "Saad",
-          title: "Founder, vornixverse",
-          email: "saad@vornixverse.com",
-          avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80",
-          authProvider: "Google Verified",
-          joinedDate: new Date().toLocaleDateString()
-        };
+      let email = quickGoogleEmail.trim();
+      let name = "Google User";
+
+      if (email) {
+        // Derive clean name from email prefix
+        const prefix = email.split("@")[0];
+        name = prefix.charAt(0).toUpperCase() + prefix.slice(1);
       } else {
-        const fallbackName = customInputName.trim() || "Google Member";
-        const fallbackEmail = customInputEmail.trim() || `${fallbackName.toLowerCase().replace(/\s+/g, "")}@gmail.com`;
-        userObj = {
-          id: `g_user_${Date.now()}`,
-          name: fallbackName,
-          title: "NutriVerse Member",
-          email: fallbackEmail,
-          avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80",
-          authProvider: "Google Verified",
-          joinedDate: new Date().toLocaleDateString()
-        };
+        email = "user@gmail.com";
       }
+
+      const userObj = {
+        id: `g_user_${Date.now()}`,
+        name: name,
+        title: "Google Verified Member",
+        email: email.includes("@") ? email : `${email}@gmail.com`,
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80",
+        authProvider: "Google Account",
+        joinedDate: new Date().toLocaleDateString()
+      };
 
       const user = loginWithGoogle(userObj);
       setCurrentUser(user);
@@ -129,7 +141,38 @@ export default function GoogleLoginModal({
         onLoginSuccess(user);
       }
       onClose();
-    }, 700);
+    }, 650);
+  };
+
+  // 2. Fill in the blanks form submit
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim()) return;
+
+    setIsConnecting(true);
+    setConnectingStatus("Creating your NutriVerse profile...");
+
+    setTimeout(() => {
+      const userObj = {
+        id: `user_${Date.now()}`,
+        name: formData.name.trim(),
+        title: "NutriVerse Member",
+        email: formData.email.trim(),
+        avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200&auto=format&fit=crop&q=80",
+        authProvider: "Email Account",
+        joinedDate: new Date().toLocaleDateString()
+      };
+
+      const user = loginWithGoogle(userObj);
+      setCurrentUser(user);
+      setCustomName(user.name);
+      setIsConnecting(false);
+
+      if (onLoginSuccess) {
+        onLoginSuccess(user);
+      }
+      onClose();
+    }, 550);
   };
 
   const handleLogout = () => {
@@ -234,12 +277,12 @@ export default function GoogleLoginModal({
             </div>
             <div>
               <h3 className="font-extrabold text-white text-base">
-                {currentUser ? "NutriVerse Member Profile" : "Sign in with Google"}
+                {currentUser ? "My NutriVerse Profile" : "Account Sign-In"}
               </h3>
               <p className="text-xs text-slate-400">
                 {currentUser
                   ? "Identity, Photo & Personal Allergy Shield"
-                  : "Choose an account to continue to NutriVerse"}
+                  : "Sign in with Google or fill in your details"}
               </p>
             </div>
           </div>
@@ -252,37 +295,42 @@ export default function GoogleLoginModal({
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-5">
+        <div className="p-5 space-y-4">
           {!currentUser ? (
-            /* Unauthenticated View: Realistic Google Account Chooser */
+            /* Unauthenticated View: 2 Clear Methods (Google Direct or Fill Form) */
             <div className="space-y-4">
               
-              {/* Google Brand Header */}
-              <div className="text-center pb-1">
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md flex items-center justify-center mb-3">
-                  <svg className="w-7 h-7" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                    />
+              {/* Login Method Tabs */}
+              <div className="flex rounded-xl bg-slate-800/80 p-1 border border-slate-700/60">
+                <button
+                  type="button"
+                  onClick={() => setLoginMode("google")}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    loginMode === "google"
+                      ? "bg-emerald-600 text-white shadow-sm"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                   </svg>
-                </div>
-                <h4 className="text-base font-black text-white">Choose a Google Account</h4>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Sign in to save your scan history, favorite products, and activate personalized dietary warnings.
-                </p>
+                  <span>Google Sign-In</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginMode("form")}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    loginMode === "form"
+                      ? "bg-emerald-600 text-white shadow-sm"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>Fill in Details</span>
+                </button>
               </div>
 
               {/* Connecting State */}
@@ -293,119 +341,22 @@ export default function GoogleLoginModal({
                   </div>
                   <div>
                     <p className="text-sm font-bold text-white">{connectingStatus}</p>
-                    <p className="text-xs text-slate-400 mt-1">Google OAuth 2.0 Authentication</p>
+                    <p className="text-xs text-slate-400 mt-1">Connecting account securely...</p>
                   </div>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  
-                  {/* Account Choice 1: Saad (1-Tap Sign In) */}
-                  <button
-                    onClick={() => handleInstantGoogleLogin("saad")}
-                    className="w-full p-3.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-emerald-500/60 rounded-2xl transition-all flex items-center justify-between group cursor-pointer shadow-md text-left"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img
-                          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&auto=format&fit=crop&q=80"
-                          alt="Saad"
-                          className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-400"
-                        />
-                        <div className="absolute -bottom-1 -right-1 bg-white p-0.5 rounded-full shadow-xs">
-                          <svg className="w-3 h-3" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                          </svg>
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-extrabold text-sm text-white">Saad</span>
-                          <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.2 rounded-md border border-emerald-500/30">
-                            Founder
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-400 font-mono">saad@vornixverse.com</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition-transform">
-                      <span className="hidden sm:inline mr-1">Sign In</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </button>
+              ) : loginMode === "google" ? (
+                /* Method 1: Google Direct 1-Click */
+                <div className="space-y-4">
+                  <div className="text-center py-2">
+                    <p className="text-xs text-slate-300">
+                      Sign in with your Google account to automatically store your scan history and activate custom dietary warnings.
+                    </p>
+                  </div>
 
-                  {/* Account Choice 2: Custom Google Account Toggle */}
-                  {!showCustomForm ? (
-                    <button
-                      onClick={() => setShowCustomForm(true)}
-                      className="w-full p-3 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/80 rounded-2xl transition-all flex items-center justify-between cursor-pointer text-left text-slate-300 hover:text-white"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300">
-                          <UserPlus className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-white">Use another Google account</p>
-                          <p className="text-[11px] text-slate-400">Sign in with your personal Gmail</p>
-                        </div>
-                      </div>
-                      <span className="text-xs text-slate-400 font-bold">+ Add</span>
-                    </button>
-                  ) : (
-                    /* Custom Account Entry Form */
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleInstantGoogleLogin("custom");
-                      }}
-                      className="p-3.5 bg-slate-800/90 rounded-2xl border border-slate-700 space-y-3"
-                    >
-                      <div>
-                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Your Full Name</label>
-                        <input
-                          type="text"
-                          required
-                          value={customInputName}
-                          onChange={(e) => setCustomInputName(e.target.value)}
-                          placeholder="e.g. Rahul, Priya, Alex"
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-hidden focus:border-emerald-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Google Email Address</label>
-                        <input
-                          type="email"
-                          required
-                          value={customInputEmail}
-                          onChange={(e) => setCustomInputEmail(e.target.value)}
-                          placeholder="yourname@gmail.com"
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-hidden focus:border-emerald-500"
-                        />
-                      </div>
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setShowCustomForm(false)}
-                          className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-xs font-bold text-slate-300"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold text-white shadow-md shadow-emerald-600/30"
-                        >
-                          Sign In with Google
-                        </button>
-                      </div>
-                    </form>
-                  )}
-
-                  {/* Primary 1-Click Fast Button */}
+                  {/* 1-Tap Google Button */}
                   <button
-                    onClick={() => handleInstantGoogleLogin("saad")}
-                    className="w-full py-3 px-4 bg-white hover:bg-slate-100 active:scale-98 text-slate-900 font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 cursor-pointer ring-2 ring-slate-300 mt-2"
+                    onClick={handleGoogleOneClick}
+                    className="w-full py-3.5 px-4 bg-white hover:bg-slate-100 active:scale-98 text-slate-900 font-extrabold text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer ring-2 ring-slate-300"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -413,14 +364,103 @@ export default function GoogleLoginModal({
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                     </svg>
-                    <span>One-Tap Google Sign In</span>
+                    <span>One-Tap Sign in with Google</span>
                   </button>
 
+                  <div className="relative flex py-1 items-center">
+                    <div className="flex-grow border-t border-slate-700"></div>
+                    <span className="shrink-0 mx-3 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                      Or use your specific Gmail
+                    </span>
+                    <div className="flex-grow border-t border-slate-700"></div>
+                  </div>
+
+                  {/* Quick Gmail input */}
+                  <form onSubmit={handleGoogleOneClick} className="space-y-2">
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                      <input
+                        type="email"
+                        value={quickGoogleEmail}
+                        onChange={(e) => setQuickGoogleEmail(e.target.value)}
+                        placeholder="yourname@gmail.com"
+                        className="w-full pl-9 pr-3 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-emerald-500"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full py-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 text-emerald-400 hover:text-emerald-300 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Connect with this Google Email</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </form>
                 </div>
+              ) : (
+                /* Method 2: Fill in the Blanks Form */
+                <form onSubmit={handleFormSubmit} className="space-y-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                      Full Name (പൂർണ്ണ നാമം) *
+                    </label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Enter your name"
+                        className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                      Email Address (ഇമെയിൽ) *
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="name@example.com"
+                        className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                      Password (പാസ്‌വേഡ്)
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        placeholder="••••••••"
+                        className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Complete Sign In</span>
+                  </button>
+                </form>
               )}
             </div>
           ) : (
-            /* Logged In View: Profile Customizer + Allergy / Sensitivity Toggles */
+            /* Logged In View: Member Profile + Allergy Shield */
             <div className="space-y-4">
               
               {/* User Identity Card with Photo Edit */}
@@ -454,7 +494,7 @@ export default function GoogleLoginModal({
                           />
                           <button
                             onClick={handleSaveName}
-                            className="p-1 bg-emerald-500 text-slate-950 rounded-lg text-xs"
+                            className="p-1 bg-emerald-500 text-slate-950 rounded-lg text-xs cursor-pointer"
                           >
                             <Check className="w-3.5 h-3.5 stroke-[3]" />
                           </button>
@@ -464,7 +504,7 @@ export default function GoogleLoginModal({
                           <h4 className="text-sm font-extrabold text-white truncate">{currentUser.name}</h4>
                           <button
                             onClick={() => setIsEditingName(true)}
-                            className="text-slate-400 hover:text-white p-0.5"
+                            className="text-slate-400 hover:text-white p-0.5 cursor-pointer"
                             title="Edit Name"
                           >
                             <Edit2 className="w-3 h-3" />
